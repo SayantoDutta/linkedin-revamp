@@ -1,0 +1,28 @@
+# Runtime, per-user — NEVER commit. Holds scraped PII: full profile backup,
+# parsed CV, contact info, evidence screenshots, audit log, session lock.
+snapshots/
+*.session-lock
+.gate-token
+
+# Banner / video build artifacts
+banner.png
+demo_*.png
+demo_walkthrough.mp4
+walkthrough.mp4
+walkthrough-spec.json
+_walkthrough_frames/
+_concat*.txt
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
