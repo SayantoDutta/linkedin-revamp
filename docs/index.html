@@ -1,227 +1,416 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>linkedin-revamp — rebuild your LinkedIn in one session</title>
-<meta name="description" content="A Claude skill that rebuilds any LinkedIn profile into a premium, social-media-manager-grade profile in one session. CV-aware audit, plain-English interview, live edits you approve one by one.">
-<meta property="og:title" content="linkedin-revamp — rebuild your LinkedIn in one session">
-<meta property="og:description" content="Reads your CV, audits your profile, interviews you, rewrites every section, and edits LinkedIn for you — with your approval on every change.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://shayantodutta.github.io/linkedin-revamp/">
-<meta property="og:image" content="https://shayantodutta.github.io/linkedin-revamp/og-card.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="linkedin-revamp — rebuild your LinkedIn in one session">
-<meta name="twitter:description" content="A Claude skill that audits, rewrites, and edits your profile for you. Free, open source.">
-<meta name="twitter:image" content="https://shayantodutta.github.io/linkedin-revamp/og-card.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<meta name="description" content="A Claude skill that rebuilds any LinkedIn profile into a premium, social-media-manager-grade profile in one session. CV-aware audit, plain-English interview, live edits you approve one by one." />
+<meta property="og:title" content="linkedin-revamp — rebuild your LinkedIn in one session" />
+<meta property="og:description" content="Reads your CV, audits your profile, interviews you, rewrites every section, and edits LinkedIn for you — with your approval on every change." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://shayantodutta.github.io/linkedin-revamp/" />
+<meta property="og:image" content="https://shayantodutta.github.io/linkedin-revamp/og-card.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="linkedin-revamp — rebuild your LinkedIn in one session" />
+<meta name="twitter:description" content="A Claude skill that audits, rewrites, and edits your profile for you. Free, open source." />
+<meta name="twitter:image" content="https://shayantodutta.github.io/linkedin-revamp/og-card.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
-  :root{
-    --bg:#0F1115; --bg-2:#15181F; --bg-3:#1B1F28;
-    --ink:#F5F7FA; --ink-2:#AEB6C2; --ink-3:#6B7280;
-    --mint:#6FFFB8; --mint-2:#1FB6A0; --line:rgba(255,255,255,.08);
-    --maxw:1080px;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{
-    background:var(--bg); color:var(--ink);
-    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-    line-height:1.6; -webkit-font-smoothing:antialiased;
-    overflow-x:hidden;
-  }
-  a{color:inherit;text-decoration:none}
-  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
-  h1,h2,h3{font-family:'Space Grotesk','Inter',sans-serif;line-height:1.1;letter-spacing:-.02em}
-  .mint{color:var(--mint)}
-  .mono{font-variant-ligatures:none}
+:root{
+  --bg:#EBEBEB;
+  --bg-2:#DEDEDE;
+  --ink:#141414;
+  --ink-2:#2A2A2A;
+  --muted:#6B6B6B;
+  --line:rgba(20,20,20,0.12);
+  --line-2:rgba(20,20,20,0.24);
+  --accent:#FF5B1F;
+  --accent-soft:#FFE8DC;
+  --serif:"Instrument Serif",ui-serif,Georgia,serif;
+  --sans:"Inter Tight",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ease:cubic-bezier(0.65,0,0.35,1);
+  --ease-out:cubic-bezier(0.22,1,0.36,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:17px;
+  line-height:1.5;
+  overflow-x:hidden;
+  cursor:none;
+}
+a{color:inherit;text-decoration:none}
+button{background:none;border:0;color:inherit;font:inherit;cursor:none}
+img,svg{display:block;max-width:100%}
+::selection{background:var(--ink);color:var(--bg)}
 
-  /* nav */
-  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(15,17,21,.7);border-bottom:1px solid var(--line)}
-  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
-  .brand{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk';font-weight:700;font-size:18px}
-  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--mint);box-shadow:0 0 16px var(--mint)}
-  .nav-links{display:flex;gap:28px;align-items:center;font-size:14px;color:var(--ink-2)}
-  .nav-links a:hover{color:var(--ink)}
-  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--mint);color:#06231A;font-weight:700;padding:11px 20px;border-radius:10px;font-size:14px;transition:transform .15s ease,box-shadow .15s ease}
-  .btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(111,255,184,.25)}
-  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
-  .btn-ghost:hover{border-color:var(--mint);box-shadow:none}
-  @media(max-width:720px){.nav-links a:not(.btn){display:none}}
+/* CUSTOM CURSOR */
+.cursor{
+  position:fixed;top:0;left:0;width:12px;height:12px;border-radius:50%;
+  background:var(--ink);pointer-events:none;z-index:9999;
+  transform:translate3d(0,0,0);
+  transition:width .3s var(--ease),height .3s var(--ease),opacity .2s ease;
+  will-change:transform;
+}
+.cursor.link{width:48px;height:48px}
+@media(hover:none){ body{cursor:auto} .cursor{display:none} button,a{cursor:pointer} }
+@media(pointer:coarse){ body{cursor:auto} .cursor{display:none} button,a{cursor:pointer} }
 
-  /* hero */
-  .hero{position:relative;padding:104px 0 80px;text-align:center;overflow:hidden}
-  .hero::before{content:"";position:absolute;top:-30%;left:50%;transform:translateX(-50%);width:900px;height:600px;background:radial-gradient(ellipse at center,rgba(111,255,184,.16),transparent 62%);filter:blur(20px);z-index:0;pointer-events:none}
-  .hero .wrap{position:relative;z-index:1}
-  .tagchip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--bg-2);padding:7px 14px;border-radius:999px;font-size:13px;color:var(--ink-2);margin-bottom:28px}
-  .tagchip b{color:var(--mint);font-weight:600}
-  .hero h1{font-size:clamp(40px,7vw,76px);font-weight:800;margin-bottom:22px}
-  .hero h1 .line2{color:var(--ink-2)}
-  .hero p.sub{font-size:clamp(17px,2.4vw,21px);color:var(--ink-2);max-width:640px;margin:0 auto 36px}
-  .hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-  .hero-note{margin-top:22px;font-size:13px;color:var(--ink-3)}
+/* NAV */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:18px 32px;
+  display:flex;justify-content:space-between;align-items:center;
+  color:var(--ink);
+  background:rgba(235,235,235,0.72);backdrop-filter:saturate(180%) blur(10px);-webkit-backdrop-filter:saturate(180%) blur(10px);
+  border-bottom:1px solid transparent;
+  font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;
+  transition:background .3s var(--ease), border-color .3s var(--ease);
+}
+.nav.scrolled{background:rgba(235,235,235,0.88);border-bottom-color:var(--line)}
+.nav .brand{display:flex;align-items:center;gap:10px}
+.nav .brand .star{width:10px;height:10px;position:relative}
+.nav .brand .star::before{content:"";position:absolute;inset:0;background:var(--accent);clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%)}
+.nav ul{list-style:none;display:flex;gap:28px;align-items:center}
+.nav ul a{position:relative;padding:4px 0;transition:opacity .25s ease}
+.nav ul a::after{
+  content:"";position:absolute;left:0;bottom:0;width:100%;height:1px;background:currentColor;
+  transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease-out);
+}
+.nav ul a:hover::after{transform:scaleX(1)}
+.nav .gh{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--line-2);border-radius:999px;transition:background .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease)}
+.nav .gh::after{display:none}
+.nav .gh:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 
-  /* generic section */
-  section{padding:72px 0;position:relative}
-  .eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--mint-2);font-weight:700;margin-bottom:14px}
-  .sec-head{text-align:center;max-width:620px;margin:0 auto 52px}
-  .sec-head h2{font-size:clamp(28px,4.5vw,42px);font-weight:700;margin-bottom:14px}
-  .sec-head p{color:var(--ink-2);font-size:17px}
+/* LAYOUT */
+.wrap{padding:0 32px;max-width:1600px;margin:0 auto}
+section{position:relative}
 
-  /* value row */
-  .vals{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-  .val{background:var(--bg-2);border:1px solid var(--line);border-radius:16px;padding:28px}
-  .val .ic{font-size:24px;margin-bottom:14px}
-  .val h3{font-size:18px;margin-bottom:8px}
-  .val p{color:var(--ink-2);font-size:15px}
-  @media(max-width:820px){.vals{grid-template-columns:1fr}}
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:5vh;padding-top:120px;position:relative}
+.hero .eyebrow{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+  padding-bottom:24px;border-bottom:1px solid var(--line);margin-bottom:40px;gap:24px;flex-wrap:wrap;
+}
+.hero .eyebrow span:first-child{max-width:420px;line-height:1.6}
+.hero h1{
+  font-family:var(--serif);font-weight:400;font-style:italic;
+  font-size:clamp(52px,11vw,190px);
+  line-height:.9;letter-spacing:-.035em;
+  color:var(--ink);padding-bottom:.08em;max-width:14ch;
+}
+.hero h1 .plain{font-style:normal;font-family:var(--sans);font-weight:300;letter-spacing:-.04em}
+.hero h1 .accent{color:var(--accent)}
+.hero .lede{margin-top:36px;font-size:clamp(18px,2.2vw,24px);line-height:1.45;color:var(--ink-2);max-width:54ch;font-weight:300}
+.hero .hero-cta{margin-top:40px;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.btn{
+  display:inline-flex;align-items:center;gap:12px;padding:16px 28px;border-radius:999px;
+  background:var(--ink);color:var(--bg);font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+  transition:background .4s var(--ease),transform .4s var(--ease);
+}
+.btn:hover{background:var(--accent);transform:translateX(4px)}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line-2)}
+.btn-ghost:hover{background:var(--ink);color:var(--bg);border-color:var(--ink);transform:translateX(4px)}
+.hero-note{margin-top:22px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hero-note b{color:var(--accent);font-weight:500}
 
-  /* phases timeline */
-  .phases{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-  .timeline{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;max-width:920px;margin:0 auto}
-  .phase{display:flex;gap:16px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
-  .phase .num{flex:0 0 38px;height:38px;border-radius:10px;background:rgba(111,255,184,.1);color:var(--mint);font-family:'Space Grotesk';font-weight:700;display:flex;align-items:center;justify-content:center;font-size:16px}
-  .phase h3{font-size:16px;margin-bottom:3px}
-  .phase p{font-size:14px;color:var(--ink-2)}
-  @media(max-width:720px){.timeline{grid-template-columns:1fr}}
+/* MARQUEE */
+.marquee{
+  margin-top:70px;overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:16px 0;
+}
+.marquee-track{display:flex;gap:40px;white-space:nowrap;animation:marquee 55s linear infinite;transform:translate3d(0,0,0)}
+.marquee-track span{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--ink);display:flex;align-items:center;gap:40px}
+.marquee-track span::before{content:"✳";color:var(--accent);font-style:normal;font-size:14px;transform:translateY(-2px)}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-  /* install */
-  .code{background:#0A0C10;border:1px solid var(--line);border-radius:14px;overflow:hidden;text-align:left;max-width:760px;margin:0 auto}
-  .code .bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--bg-3)}
-  .code .bar .d{width:11px;height:11px;border-radius:50%}
-  .code .bar .d.r{background:#FF5F57}.code .bar .d.y{background:#FEBC2E}.code .bar .d.g{background:#28C840}
-  .code .bar span{margin-left:8px;font-size:12px;color:var(--ink-3)}
-  .code pre{padding:20px;overflow-x:auto;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:13.5px;line-height:1.8;color:var(--ink)}
-  .code .cmt{color:var(--ink-3)}
-  .code .tok{color:var(--mint)}
-  .tabs{display:flex;gap:8px;justify-content:center;margin-bottom:18px}
-  .tab{background:var(--bg-2);border:1px solid var(--line);color:var(--ink-2);padding:8px 18px;border-radius:9px;font-size:14px;cursor:pointer;font-weight:500}
-  .tab.active{background:rgba(111,255,184,.1);border-color:var(--mint);color:var(--mint)}
-  .install-step{max-width:760px;margin:0 auto 16px;display:flex;gap:14px;align-items:flex-start;font-size:15px;color:var(--ink-2)}
-  .install-step .n{flex:0 0 26px;height:26px;border-radius:7px;background:var(--bg-3);color:var(--ink);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+/* SECTION HEADERS */
+.s-head{
+  display:grid;grid-template-columns:80px 1fr auto;gap:32px;align-items:baseline;
+  padding:140px 0 64px;border-top:1px solid var(--line);
+}
+.s-head .num{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--muted)}
+.s-head h2{
+  font-family:var(--serif);font-style:italic;font-weight:400;
+  font-size:clamp(42px,6.2vw,88px);line-height:.95;letter-spacing:-.025em;
+}
+.s-head h2 .p{font-style:normal;font-family:var(--sans);font-weight:300}
+.s-head h2 .accent{color:var(--accent)}
+.s-head .side{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:right;max-width:300px;line-height:1.6}
 
-  /* before/after */
-  .ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:880px;margin:0 auto}
-  .ba{border-radius:14px;padding:24px;border:1px solid var(--line)}
-  .ba.before{background:var(--bg-2)}
-  .ba.after{background:linear-gradient(180deg,rgba(111,255,184,.06),var(--bg-2));border-color:rgba(111,255,184,.25)}
-  .ba .lbl{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:12px}
-  .ba.before .lbl{color:var(--ink-3)}.ba.after .lbl{color:var(--mint)}
-  .ba .q{font-size:15px;line-height:1.6;color:var(--ink)}
-  .ba .q.dim{color:var(--ink-3)}
-  .ba-cap{text-align:center;font-size:13px;color:var(--ink-3);margin-top:18px}
-  @media(max-width:720px){.ba-grid{grid-template-columns:1fr}}
+/* VALUE / CAPABILITIES GRID */
+.caps{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;padding-bottom:40px}
+.cap{
+  grid-column:span 4;background:var(--bg-2);border-radius:18px;padding:32px;
+  display:flex;flex-direction:column;gap:20px;min-height:260px;
+  transition:transform .4s var(--ease),background-color .4s var(--ease),color .3s var(--ease);
+  position:relative;overflow:hidden;color:var(--ink);
+}
+.cap:hover{transform:translateY(-4px);background-color:var(--ink);color:var(--bg)}
+.cap:hover p{color:rgba(235,235,235,0.75)}
+.cap:hover .cap-icon{border-color:var(--bg)}
+.cap-icon{width:56px;height:56px;border-radius:14px;border:1px solid var(--line-2);display:grid;place-items:center;font-size:24px;transition:border-color .3s var(--ease)}
+.cap h3{font-family:var(--serif);font-style:italic;font-size:30px;letter-spacing:-.02em;line-height:1}
+.cap p{color:var(--muted);font-size:14.5px;line-height:1.55}
+.cap:first-child{grid-column:span 8;background:var(--ink);color:var(--bg);min-height:300px}
+.cap:first-child h3,.cap:first-child p{color:var(--bg)}
+.cap:first-child p{color:rgba(235,235,235,.7)}
+.cap:first-child .cap-icon{border-color:rgba(255,255,255,.2)}
+.cap:first-child:hover{background:var(--accent)}
+.cap:first-child:hover p{color:rgba(20,20,20,.8)}
 
-  /* safety */
-  .safety{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-  .safe-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:900px;margin:0 auto}
-  .safe{display:flex;gap:14px;padding:20px;background:var(--bg);border:1px solid var(--line);border-radius:13px}
-  .safe .ic{flex:0 0 auto;color:var(--mint);font-size:20px;line-height:1.3}
-  .safe h3{font-size:16px;margin-bottom:4px}
-  .safe p{font-size:14px;color:var(--ink-2)}
-  @media(max-width:720px){.safe-grid{grid-template-columns:1fr}}
+/* STEPS (how it works) */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;padding-bottom:40px}
+.step{
+  background:var(--bg-2);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:14px;min-height:200px;
+  transition:background-color .3s var(--ease),transform .3s var(--ease),color .3s var(--ease);color:var(--ink);
+}
+.step:hover{background-color:var(--ink);transform:translateY(-4px);color:var(--bg)}
+.step:hover p{color:rgba(235,235,235,0.7)}
+.step:hover .step-num{color:var(--accent)}
+.step .step-num{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--muted)}
+.step h4{font-family:var(--serif);font-style:italic;font-size:24px;line-height:1.02;letter-spacing:-.015em}
+.step p{color:var(--muted);font-size:13.5px;line-height:1.5;flex:1}
 
-  /* faq */
-  details{background:var(--bg-2);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;max-width:760px;margin-left:auto;margin-right:auto;overflow:hidden}
-  details summary{padding:18px 22px;cursor:pointer;font-weight:600;font-size:16px;list-style:none;display:flex;justify-content:space-between;align-items:center}
-  details summary::-webkit-details-marker{display:none}
-  details summary::after{content:"+";color:var(--mint);font-size:22px;font-weight:400}
-  details[open] summary::after{content:"–"}
-  details .body{padding:0 22px 20px;color:var(--ink-2);font-size:15px}
+/* INSTALL */
+.install-body{padding-bottom:40px}
+.install-step{max-width:820px;margin:0 auto 18px;display:flex;gap:16px;align-items:flex-start;font-size:16px;color:var(--ink-2)}
+.install-step .n{flex:0 0 28px;height:28px;border-radius:8px;background:var(--ink);color:var(--bg);font-family:var(--mono);font-size:12px;font-weight:500;display:grid;place-items:center}
+.install-step b{font-weight:500;color:var(--ink)}
+.install-step .cmd{font-family:var(--mono);background:var(--accent-soft);color:var(--accent);padding:1px 8px;border-radius:6px;font-size:14px}
+.tabs{display:flex;gap:8px;justify-content:center;margin:8px auto 18px;max-width:820px}
+.tab{background:var(--bg-2);border:1px solid var(--line);color:var(--muted);padding:9px 18px;border-radius:999px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:none}
+.tab.active{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.code{background:var(--ink);border-radius:18px;overflow:hidden;text-align:left;max-width:820px;margin:0 auto}
+.code .bar{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid rgba(235,235,235,.1)}
+.code .bar .d{width:11px;height:11px;border-radius:50%}
+.code .bar .d.r{background:#FF5F57}.code .bar .d.y{background:#FEBC2E}.code .bar .d.g{background:#28C840}
+.code .bar span{margin-left:8px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:rgba(235,235,235,.5)}
+.code pre{padding:24px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.9;color:var(--bg)}
+.code .tok{color:var(--accent)}
 
-  /* cta */
-  .cta-final{text-align:center}
-  .cta-final h2{font-size:clamp(30px,5vw,48px);margin-bottom:18px}
-  .cta-final p{color:var(--ink-2);font-size:18px;margin-bottom:32px}
+/* BEFORE / AFTER */
+.ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:980px;margin:0 auto;padding-bottom:40px}
+.ba{border-radius:18px;padding:28px;border:1px solid var(--line)}
+.ba.before{background:var(--bg-2)}
+.ba.after{background:var(--accent-soft);border-color:rgba(255,91,31,.32)}
+.ba .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:500;margin-bottom:14px}
+.ba.before .lbl{color:var(--muted)}.ba.after .lbl{color:var(--accent)}
+.ba .q{font-family:var(--serif);font-style:italic;font-size:21px;line-height:1.35;color:var(--ink)}
+.ba .q.dim{color:var(--muted)}
+.ba-cap{grid-column:1/-1;text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+@media(max-width:720px){.ba-grid{grid-template-columns:1fr}.ba-cap{grid-column:1}}
 
-  footer{border-top:1px solid var(--line);padding:40px 0;color:var(--ink-3);font-size:14px}
-  footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
-  footer a{color:var(--ink-2)}footer a:hover{color:var(--mint)}
-  .disclaimer{max-width:var(--maxw);margin:0 auto;padding:0 24px 40px;color:var(--ink-3);font-size:12.5px;text-align:center;line-height:1.7}
+/* SAFETY */
+.safe-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding-bottom:40px}
+.safe{display:flex;flex-direction:column;gap:12px;padding:26px;background:var(--bg-2);border-radius:14px;transition:background-color .3s var(--ease),transform .3s var(--ease),color .3s var(--ease);color:var(--ink)}
+.safe:hover{background-color:var(--ink);transform:translateY(-4px);color:var(--bg)}
+.safe:hover p{color:rgba(235,235,235,0.7)}
+.safe .ic{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.safe h3{font-family:var(--serif);font-style:italic;font-size:22px;line-height:1.05;letter-spacing:-.015em}
+.safe p{font-size:14px;color:var(--muted);line-height:1.55}
+@media(max-width:900px){.safe-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.safe-grid{grid-template-columns:1fr}}
+
+/* FAQ */
+.faq-body{max-width:880px;margin:0 auto;padding-bottom:40px}
+details{border-top:1px solid var(--line);overflow:hidden}
+details:last-child{border-bottom:1px solid var(--line)}
+details summary{padding:24px 8px;cursor:none;font-family:var(--serif);font-style:italic;font-size:24px;letter-spacing:-.01em;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:24px}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"+";font-family:var(--sans);color:var(--accent);font-size:28px;font-weight:300;flex-shrink:0}
+details[open] summary::after{content:"–"}
+details .body{padding:0 8px 26px;color:var(--ink-2);font-size:15.5px;line-height:1.6;max-width:70ch}
+details .body .cmd{font-family:var(--mono);font-size:13px;color:var(--accent)}
+
+/* FINAL CTA */
+.final{padding:80px 0 40px;border-top:1px solid var(--line);margin-top:60px}
+.final h2{
+  font-family:var(--serif);font-style:italic;font-weight:400;
+  font-size:clamp(48px,10vw,160px);line-height:.9;letter-spacing:-.03em;padding-bottom:.08em;
+}
+.final h2 .plain{font-style:normal;font-family:var(--sans);font-weight:300}
+.final h2 .accent{color:var(--accent)}
+.final .cta-box{
+  margin-top:56px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:24px;
+  padding:40px;border:1px solid var(--line-2);border-radius:24px;background:var(--bg-2);
+  position:relative;overflow:hidden;
+}
+.final .cta-box::before{
+  content:"";position:absolute;inset:0;background:var(--ink);
+  transform:translateY(100%);transition:transform .65s var(--ease-out);
+}
+.final .cta-box:hover::before{transform:translateY(0)}
+.final .cta-box:hover p,.final .cta-box:hover p em{color:var(--bg)}
+.final .cta-box > *{position:relative;z-index:1;transition:color .5s var(--ease)}
+.final .cta-box p{font-family:var(--serif);font-style:italic;font-size:26px;line-height:1.3;max-width:46ch}
+.final .cta-box p em{color:var(--accent);font-style:italic}
+.final .cta-box a{
+  display:inline-flex;align-items:center;gap:12px;padding:18px 28px;border-radius:999px;
+  background:var(--ink);color:var(--bg);font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
+  transition:background .4s var(--ease),transform .4s var(--ease);
+}
+.final .cta-box:hover a{background:var(--accent)}
+.final .cta-box a:hover{transform:translateX(4px)}
+
+/* FOOTER */
+footer{padding:40px 32px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);gap:20px;flex-wrap:wrap}
+footer .left{display:flex;gap:14px;align-items:center}
+footer .left .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s infinite}
+footer a:hover{color:var(--accent)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
+.disclaimer{max-width:1600px;margin:0 auto;padding:0 32px 48px;color:var(--muted);font-size:12px;line-height:1.7;text-align:center}
+
+/* REVEAL */
+.reveal{overflow:hidden;padding:0 .02em .12em}
+.reveal > span{display:inline-block;transform:translateY(110%);opacity:0;transition:transform 1.1s var(--ease-out),opacity .6s ease}
+.reveal.in > span{transform:translateY(0);opacity:1}
+.reveal > br{display:block}
+.stagger > span{transition-delay:calc(var(--i,0) * 55ms)}
+.fade{opacity:0;transform:translateY(24px);transition:opacity .9s var(--ease-out),transform .9s var(--ease-out)}
+.fade.in{opacity:1;transform:translateY(0)}
+
+/* MEDIA */
+@media (max-width:1024px){
+  .caps{grid-template-columns:repeat(6,1fr)}
+  .cap{grid-column:span 3}.cap:first-child{grid-column:span 6}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .about-grid{grid-template-columns:40px 1fr}
+}
+@media (max-width:720px){
+  .wrap{padding:0 20px}
+  .nav{padding:16px 20px}
+  .nav ul li:not(.nav-gh){display:none}
+  .hero .eyebrow{flex-direction:column;align-items:flex-start;gap:14px}
+  .s-head{grid-template-columns:40px 1fr;gap:16px;padding:80px 0 40px}
+  .s-head .side{display:none}
+  .caps{grid-template-columns:1fr}
+  .cap,.cap:first-child{grid-column:span 1}
+  .steps{grid-template-columns:1fr}
+  .final .cta-box{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:16px;text-align:center}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  .reveal > span{transform:none;opacity:1}
+  .fade{opacity:1;transform:none}
+  .marquee-track{animation:none}
+}
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="wrap">
-    <div class="brand"><span class="dot"></span> linkedin-revamp</div>
-    <div class="nav-links">
-      <a href="#how">How it works</a>
-      <a href="#install">Install</a>
-      <a href="#safety">Safety</a>
-      <a href="#faq">FAQ</a>
-      <a class="btn btn-ghost" href="https://github.com/ShayantoDutta/linkedin-revamp" target="_blank" rel="noopener">GitHub ↗</a>
-    </div>
-  </div>
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+
+<nav class="nav">
+  <a href="#top" class="brand" data-link><span class="star"></span><span>linkedin-revamp</span></a>
+  <ul>
+    <li><a href="#how" data-link>01 · How</a></li>
+    <li><a href="#install" data-link>02 · Install</a></li>
+    <li><a href="#safety" data-link>03 · Safety</a></li>
+    <li><a href="#faq" data-link>04 · FAQ</a></li>
+    <li class="nav-gh"><a class="gh" href="https://github.com/ShayantoDutta/linkedin-revamp" target="_blank" rel="noopener" data-link>GitHub ↗</a></li>
+  </ul>
 </nav>
 
-<header class="hero">
-  <div class="wrap">
-    <div class="tagchip">A <b>Claude</b> skill · open source · MIT</div>
-    <h1>Rebuild your LinkedIn<br><span class="line2">in one session.</span></h1>
-    <p class="sub">It reads your CV, audits your profile, interviews you about your goals, rewrites every section, and edits LinkedIn for you — with your approval on every single change.</p>
-    <div class="hero-cta">
-      <a class="btn" href="#install">Get started</a>
-      <a class="btn btn-ghost" href="https://github.com/ShayantoDutta/linkedin-revamp" target="_blank" rel="noopener">View on GitHub</a>
-    </div>
-    <p class="hero-note">No code required · You approve every edit · Type <span class="mono">abort</span> anytime</p>
-  </div>
-</header>
+<div class="wrap" id="top">
 
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="eyebrow">
+    <span>A Claude skill · open source · MIT · runs on the Claude Chrome extension</span>
+    <span>v1.0 — 2026</span>
+  </div>
+
+  <h1 class="reveal stagger" id="heroline">
+    <span style="--i:0" class="plain">Rebuild&nbsp;your</span>
+    <span style="--i:1" class="accent">&nbsp;LinkedIn</span>
+    <br>
+    <span style="--i:2">in&nbsp;one&nbsp;session</span>
+    <span style="--i:3" class="plain">.</span>
+  </h1>
+
+  <p class="lede fade">It reads your CV, audits your profile, interviews you about your goals, rewrites every section, and edits LinkedIn for you. With your approval on every single change.</p>
+
+  <div class="hero-cta fade">
+    <a class="btn" href="#install">Get started →</a>
+    <a class="btn btn-ghost" href="https://github.com/ShayantoDutta/linkedin-revamp" target="_blank" rel="noopener">View on GitHub</a>
+  </div>
+  <p class="hero-note fade">No code required · You approve every edit · Type <b>abort</b> anytime</p>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>CV-aware audit</span><span>persona interview</span><span>headline rewrite</span><span>About rewrite</span><span>live Chrome edits</span><span>full backup first</span><span>case-study pages</span><span>walkthrough videos</span><span>first-post draft</span>
+      <span>CV-aware audit</span><span>persona interview</span><span>headline rewrite</span><span>About rewrite</span><span>live Chrome edits</span><span>full backup first</span><span>case-study pages</span><span>walkthrough videos</span><span>first-post draft</span>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT -->
 <section id="what">
-  <div class="wrap">
-    <div class="vals">
-      <div class="val">
-        <div class="ic">🎯</div>
-        <h3>Written for the right reader</h3>
-        <p>A 7-question interview decides who your profile speaks to — a recruiter, a client, a peer. Every line is then written for that person.</p>
-      </div>
-      <div class="val">
-        <div class="ic">✍️</div>
-        <h3>No clichés, no AI-slop</h3>
-        <p>A built-in filter blocks "passionate", "results-driven", "synergy", and the em-dash-heavy rhythm that screams machine-written. It reads like you.</p>
-      </div>
-      <div class="val">
-        <div class="ic">🖱️</div>
-        <h3>It does the clicking</h3>
-        <p>Using the Claude Chrome extension, it drives LinkedIn for you. Or, if you prefer, it hands you copy-paste-ready text. Your call.</p>
-      </div>
+  <div class="s-head fade">
+    <div class="num">01</div>
+    <h2><span>What it</span> <span class="p">does</span></h2>
+    <div class="side">Not a template generator. A social-media manager that does the work and shows you everything.</div>
+  </div>
+
+  <div class="caps">
+    <div class="cap fade">
+      <div class="cap-icon">🖱️</div>
+      <h3>It does the clicking</h3>
+      <p>Using the Claude Chrome extension, it drives LinkedIn for you — headline, About, experience, skills, banner. Prefer to stay hands-on? It hands you copy-paste-ready text with a "where this goes" guide instead. Your call, made on the first screen.</p>
+    </div>
+    <div class="cap fade">
+      <div class="cap-icon">🎯</div>
+      <h3>Written for the right reader</h3>
+      <p>A 7-question interview decides who your profile speaks to — recruiter, client, or peer. Every line is then written for that one person.</p>
+    </div>
+    <div class="cap fade">
+      <div class="cap-icon">✍️</div>
+      <h3>No clichés, no AI-slop</h3>
+      <p>A built-in filter blocks "passionate", "results-driven", "synergy", and the em-dash rhythm that screams machine-written. It reads like you.</p>
     </div>
   </div>
 </section>
 
-<section id="how" class="phases">
-  <div class="wrap">
-    <div class="sec-head">
-      <div class="eyebrow">How it works</div>
-      <h2>Eight stages, about two hours</h2>
-      <p>You answer honest questions and approve changes. It does the heavy lifting.</p>
-    </div>
-    <div class="timeline">
-      <div class="phase"><div class="num">1</div><div><h3>Welcome &amp; setup</h3><p>Checks your browser is connected. Shows you a menu of what to switch on.</p></div></div>
-      <div class="phase"><div class="num">2</div><div><h3>Discovery</h3><p>Reads your CV and current profile. Saves a full backup so anything can be rolled back.</p></div></div>
-      <div class="phase"><div class="num">3</div><div><h3>Persona interview</h3><p>Seven plain-English questions about what you want LinkedIn to do for you.</p></div></div>
-      <div class="phase"><div class="num">4</div><div><h3>Audit</h3><p>Scores your profile out of 10 across 12 areas. Flags what's bland, fake, or missing.</p></div></div>
-      <div class="phase"><div class="num">5</div><div><h3>Plan</h3><p>Drafts a new headline, About, banner, bullets, skills — side by side with what you have.</p></div></div>
-      <div class="phase"><div class="num">6</div><div><h3>Execute</h3><p>Pushes each approved change live. Pauses and asks before anything hard to undo.</p></div></div>
-      <div class="phase"><div class="num">7</div><div><h3>Verify</h3><p>Re-checks everything went through. Produces a before/after report.</p></div></div>
-      <div class="phase"><div class="num">8</div><div><h3>Launch</h3><p>Offers case-study pages, walkthrough videos, and a draft of your first post.</p></div></div>
-    </div>
+<!-- HOW -->
+<section id="how">
+  <div class="s-head fade">
+    <div class="num">02</div>
+    <h2><span>Eight stages,</span> <span class="p">about two hours</span></h2>
+    <div class="side">You answer honest questions and approve changes. It does the heavy lifting.</div>
+  </div>
+
+  <div class="steps">
+    <div class="step fade"><div class="step-num">STAGE / 01</div><h4>Welcome &amp; setup</h4><p>Checks your browser is connected. Shows a menu of what to switch on.</p></div>
+    <div class="step fade"><div class="step-num">STAGE / 02</div><h4>Discovery</h4><p>Reads your CV and current profile. Saves a full backup so anything can be rolled back.</p></div>
+    <div class="step fade"><div class="step-num">STAGE / 03</div><h4>Persona interview</h4><p>Seven plain-English questions about what you want LinkedIn to do for you.</p></div>
+    <div class="step fade"><div class="step-num">STAGE / 04</div><h4>Audit</h4><p>Scores your profile out of 10 across 12 areas. Flags what's bland, fake, or missing.</p></div>
+    <div class="step fade"><div class="step-num">STAGE / 05</div><h4>Plan</h4><p>Drafts a new headline, About, banner, bullets and skills — side by side with what you have.</p></div>
+    <div class="step fade"><div class="step-num">STAGE / 06</div><h4>Execute</h4><p>Pushes each approved change live. Pauses and asks before anything hard to undo.</p></div>
+    <div class="step fade"><div class="step-num">STAGE / 07</div><h4>Verify</h4><p>Re-checks everything went through. Produces a before/after report.</p></div>
+    <div class="step fade"><div class="step-num">STAGE / 08</div><h4>Launch</h4><p>Offers case-study pages, walkthrough videos, and a draft of your first post.</p></div>
   </div>
 </section>
 
+<!-- INSTALL -->
 <section id="install">
-  <div class="wrap">
-    <div class="sec-head">
-      <div class="eyebrow">Install</div>
-      <h2>Up and running in three steps</h2>
-      <p>You need the Claude app and the Claude Chrome extension. That's it.</p>
-    </div>
+  <div class="s-head fade">
+    <div class="num">03</div>
+    <h2><span>Up and running in</span> <span class="p">three steps</span></h2>
+    <div class="side">You need the Claude app and the Claude Chrome extension. That's it.</div>
+  </div>
 
+  <div class="install-body fade">
     <div class="install-step"><div class="n">1</div><div>Install the <b>Claude Chrome extension</b> and sign in. (Full guide in the repo.)</div></div>
     <div class="install-step"><div class="n">2</div><div>Clone the repo and copy the three skill folders into your Claude skills directory:</div></div>
 
@@ -244,102 +433,163 @@
 <span class="tok">Copy-Item</span> -Recurse linkedin-revamp,linkedin-revamp-notion,linkedin-revamp-walkthrough $env:USERPROFILE\.claude\skills\</pre>
     </div>
 
-    <div class="install-step" style="margin-top:18px"><div class="n">3</div><div>Restart Claude, then type <b class="mint mono">/linkedin-revamp</b> — or just say <i>"fix my LinkedIn"</i>.</div></div>
+    <div class="install-step" style="margin-top:22px"><div class="n">3</div><div>Restart Claude, then type <span class="cmd">/linkedin-revamp</span> — or just say <i>"fix my LinkedIn"</i>.</div></div>
   </div>
 </section>
 
-<section id="examples" class="phases">
-  <div class="wrap">
-    <div class="sec-head">
-      <div class="eyebrow">Before / after</div>
-      <h2>Same person. Sharper signal.</h2>
-      <p>No new accomplishments invented — it finds and frames what's already there.</p>
+<!-- BEFORE / AFTER -->
+<section id="examples">
+  <div class="s-head fade">
+    <div class="num">04</div>
+    <h2><span>Same person.</span> <span class="p">Sharper signal.</span></h2>
+    <div class="side">No new accomplishments invented — it finds and frames what's already there.</div>
+  </div>
+  <div class="ba-grid">
+    <div class="ba before fade">
+      <div class="lbl">Before · Headline</div>
+      <div class="q dim">"Software Engineer at Acme"</div>
     </div>
-    <div class="ba-grid">
-      <div class="ba before">
-        <div class="lbl">Before</div>
-        <div class="q dim">"Software Engineer at Acme"</div>
-      </div>
-      <div class="ba after">
-        <div class="lbl">After</div>
-        <div class="q">"Backend engineer · Go + Postgres · I make slow services fast"</div>
-      </div>
-      <div class="ba before">
-        <div class="lbl">Before · About</div>
-        <div class="q dim">"We are on a mission to revolutionize the way restaurants think about their supply chain through cutting-edge AI…"</div>
-      </div>
-      <div class="ba after">
-        <div class="lbl">After · About</div>
-        <div class="q">"Restaurants throw away about 10% of what they buy. We've gotten our first 200 kitchens down to 7%. Here's how…"</div>
-      </div>
+    <div class="ba after fade">
+      <div class="lbl">After · Headline</div>
+      <div class="q">"Backend engineer · Go + Postgres · I make slow services fast"</div>
     </div>
-    <p class="ba-cap">Illustrative, anonymized examples. Full case studies in the repo.</p>
+    <div class="ba before fade">
+      <div class="lbl">Before · About</div>
+      <div class="q dim">"We are on a mission to revolutionize the way restaurants think about their supply chain through cutting-edge AI…"</div>
+    </div>
+    <div class="ba after fade">
+      <div class="lbl">After · About</div>
+      <div class="q">"Restaurants throw away about 10% of what they buy. We've gotten our first 200 kitchens down to 7%. Here's how…"</div>
+    </div>
+    <div class="ba-cap">Illustrative, anonymized examples. Full case studies in the repo.</div>
   </div>
 </section>
 
-<section id="safety" class="safety">
-  <div class="wrap">
-    <div class="sec-head">
-      <div class="eyebrow">Safety</div>
-      <h2>It edits your real profile. So it's careful.</h2>
-      <p>This skill drives your live LinkedIn. Every safeguard below is built in, not optional.</p>
-    </div>
-    <div class="safe-grid">
-      <div class="safe"><div class="ic">✓</div><div><h3>You approve every change</h3><p>Nothing goes live without your explicit OK, section by section.</p></div></div>
-      <div class="safe"><div class="ic">✓</div><div><h3>A hard stop before anything risky</h3><p>A built-in hook pauses and asks before any delete, file upload, or settings change.</p></div></div>
-      <div class="safe"><div class="ic">✓</div><div><h3>Full backup first</h3><p>Your whole profile is snapshotted before a single edit. Everything is reversible.</p></div></div>
-      <div class="safe"><div class="ic">✓</div><div><h3>No password, ever</h3><p>You sign in yourself. The skill never sees or types your credentials.</p></div></div>
-      <div class="safe"><div class="ic">✓</div><div><h3>Your network isn't spammed</h3><p>It turns off "share profile updates" before editing, then restores it after.</p></div></div>
-      <div class="safe"><div class="ic">✓</div><div><h3>Stays in its lane</h3><p>No messages, no billing, no saved jobs — only the profile-editing flow.</p></div></div>
-    </div>
+<!-- SAFETY -->
+<section id="safety">
+  <div class="s-head fade">
+    <div class="num">05</div>
+    <h2><span>It edits your real profile.</span> <span class="p">So it's careful.</span></h2>
+    <div class="side">This skill drives your live LinkedIn. Every safeguard below is built in, not optional.</div>
+  </div>
+  <div class="safe-grid">
+    <div class="safe fade"><div class="ic">✓ Approval</div><h3>You approve every change</h3><p>Nothing goes live without your explicit OK, section by section.</p></div>
+    <div class="safe fade"><div class="ic">✓ Hard stop</div><h3>A pause before anything risky</h3><p>A built-in hook pauses and asks before any delete, file upload, or settings change.</p></div>
+    <div class="safe fade"><div class="ic">✓ Backup</div><h3>Full backup first</h3><p>Your whole profile is snapshotted before a single edit. Everything is reversible.</p></div>
+    <div class="safe fade"><div class="ic">✓ No password</div><h3>No password, ever</h3><p>You sign in yourself. The skill never sees or types your credentials.</p></div>
+    <div class="safe fade"><div class="ic">✓ Quiet</div><h3>Your network isn't spammed</h3><p>It turns off "share profile updates" before editing, then restores it after.</p></div>
+    <div class="safe fade"><div class="ic">✓ Scoped</div><h3>Stays in its lane</h3><p>No messages, no billing, no saved jobs — only the profile-editing flow.</p></div>
   </div>
 </section>
 
+<!-- FAQ -->
 <section id="faq">
-  <div class="wrap">
-    <div class="sec-head">
-      <div class="eyebrow">FAQ</div>
-      <h2>Questions, answered</h2>
-    </div>
+  <div class="s-head fade">
+    <div class="num">06</div>
+    <h2><span>Questions,</span> <span class="p">answered</span></h2>
+    <div class="side">The honest version. No marketing.</div>
+  </div>
+  <div class="faq-body fade">
     <details><summary>Do I need to know how to code?</summary><div class="body">No. Every question is plain English and the skill does the technical work. The only mildly technical step is the one-time install (copy-paste the commands above).</div></details>
-    <details><summary>Is it safe to let it edit my LinkedIn?</summary><div class="body">It backs up your profile first, previews every change, and asks before anything irreversible. You can type <span class="mono">abort</span> at any moment. It never touches your password, messages, or billing. The full threat model is in the repo's SECURITY.md.</div></details>
+    <details><summary>Is it safe to let it edit my LinkedIn?</summary><div class="body">It backs up your profile first, previews every change, and asks before anything irreversible. You can type <span class="cmd">abort</span> at any moment. It never touches your password, messages, or billing. The full threat model is in the repo's SECURITY.md.</div></details>
     <details><summary>What if I don't want it clicking around my browser?</summary><div class="body">On the first screen you choose what to switch on. Turn the browser automation off and the skill instead writes everything as copy-paste-ready text with a "where to paste this" guide.</div></details>
     <details><summary>Will my connections get notified on every edit?</summary><div class="body">No. The skill turns off "Share profile updates with your network" before it edits anything, and restores your original setting when it's done.</div></details>
     <details><summary>Does it make things up?</summary><div class="body">No. It only reframes what's already in your CV and profile. If a project has no real number yet, it says so honestly rather than inventing one.</div></details>
     <details><summary>What does it cost?</summary><div class="body">The skill is free and open source (MIT). You need a Claude account and the Chrome extension.</div></details>
-    <details><summary>It's brand new — has it been battle-tested?</summary><div class="body">It's a fresh v1.0 release. It's been built carefully and reviewed, but it hasn't yet been run across many different profiles in the wild. Treat the first run as a careful one — and the full backup means anything can be rolled back.</div></details>
+    <details><summary>It's brand new — has it been battle-tested?</summary><div class="body">It's a fresh v1.0 release. Built carefully and reviewed, but not yet run across many profiles in the wild. Treat the first run as a careful one — and the full backup means anything can be rolled back.</div></details>
   </div>
 </section>
 
-<section class="cta-final">
+</div>
+
+<!-- FINAL CTA -->
+<section class="final">
   <div class="wrap">
-    <h2>Your profile, rebuilt.</h2>
-    <p>Open source. Free. Yours to run in one session.</p>
-    <div class="hero-cta">
-      <a class="btn" href="https://github.com/ShayantoDutta/linkedin-revamp" target="_blank" rel="noopener">Get it on GitHub ↗</a>
+    <h2 class="reveal stagger" id="finalline">
+      <span style="--i:0" class="plain">Your&nbsp;profile,</span>
+      <span style="--i:1" class="accent">&nbsp;rebuilt</span>
+      <span style="--i:2" class="plain">.</span>
+    </h2>
+
+    <div class="cta-box fade">
+      <p>Open source. Free. Yours to run in <em>one session</em> — with a full backup and your approval on every change.</p>
+      <a href="https://github.com/ShayantoDutta/linkedin-revamp" target="_blank" rel="noopener">Get it on GitHub →</a>
     </div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">
-    <div class="brand"><span class="dot"></span> linkedin-revamp</div>
-    <div>
-      <a href="https://github.com/ShayantoDutta/linkedin-revamp" target="_blank" rel="noopener">GitHub</a> ·
-      <a href="https://github.com/ShayantoDutta/linkedin-revamp/blob/main/linkedin-revamp/SECURITY.md" target="_blank" rel="noopener">Security</a> ·
-      <a href="https://github.com/ShayantoDutta/linkedin-revamp/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
-    </div>
+  <div class="left"><span class="dot"></span><span>linkedin-revamp · v1.0 · 2026</span></div>
+  <div>
+    <a href="https://github.com/ShayantoDutta/linkedin-revamp" target="_blank" rel="noopener">GitHub</a> ·
+    <a href="https://github.com/ShayantoDutta/linkedin-revamp/blob/main/linkedin-revamp/SECURITY.md" target="_blank" rel="noopener">Security</a> ·
+    <a href="https://github.com/ShayantoDutta/linkedin-revamp/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
   </div>
+  <div>Built by Shayanto Dutta · Shipped with Claude</div>
 </footer>
 <p class="disclaimer">linkedin-revamp is an independent open-source project and is not affiliated with or endorsed by LinkedIn or Anthropic. You are responsible for any change pushed to your profile. Automating LinkedIn is a gray area in its terms — the skill uses your own signed-in session, human-paced, with your approval on every action.</p>
 
 <script>
-  function showTab(which,btn){
-    document.getElementById('tab-mac').style.display = which==='mac'?'block':'none';
-    document.getElementById('tab-win').style.display = which==='win'?'block':'none';
-    document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
-    btn.classList.add('active');
+/* ---------- CUSTOM CURSOR ---------- */
+(function(){
+  const c = document.getElementById('cursor');
+  if(!c) return;
+  if(matchMedia('(pointer:coarse)').matches || matchMedia('(hover:none)').matches){ c.style.display='none'; return; }
+  let x=0,y=0,tx=0,ty=0,dirty=false,raf=0;
+  window.addEventListener('mousemove',e=>{tx=e.clientX;ty=e.clientY;dirty=true;if(!raf)raf=requestAnimationFrame(loop)},{passive:true});
+  function loop(){
+    raf=0;
+    const nx = x+(tx-x)*0.25, ny = y+(ty-y)*0.25;
+    if(Math.abs(nx-x)<0.1 && Math.abs(ny-y)<0.1 && !dirty){ x=tx; y=ty; }
+    else{ x=nx; y=ny; dirty=false; raf=requestAnimationFrame(loop); }
+    c.style.transform = `translate3d(${x}px,${y}px,0) translate(-50%,-50%)`;
   }
+  document.addEventListener('mouseover',e=>{
+    if(e.target.closest('a,button,[data-link],summary,.tab')){ c.classList.add('link'); }
+  },{passive:true});
+  document.addEventListener('mouseout',e=>{
+    const l=e.target.closest('a,button,[data-link],summary,.tab');
+    if(l && !(e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('a,button,[data-link],summary,.tab'))){ c.classList.remove('link'); }
+  },{passive:true});
+})();
+
+/* ---------- NAV scrolled state ---------- */
+(function(){
+  const nav = document.querySelector('.nav');
+  if(!nav) return;
+  let ticking=false;
+  function onScroll(){
+    if(!ticking){
+      requestAnimationFrame(()=>{ nav.classList.toggle('scrolled', window.scrollY>40); ticking=false; });
+      ticking=true;
+    }
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+})();
+
+/* ---------- HERO REVEAL KICKOFF ---------- */
+(function(){
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.getElementById('heroline').classList.add('in');
+  }));
+})();
+
+/* ---------- REVEAL ON SCROLL ---------- */
+(function(){
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:0.15,rootMargin:'0px 0px -60px 0px'});
+  document.querySelectorAll('.reveal:not(#heroline), .fade').forEach(el=>io.observe(el));
+})();
+
+/* ---------- INSTALL TABS ---------- */
+function showTab(which,btn){
+  document.getElementById('tab-mac').style.display = which==='mac'?'block':'none';
+  document.getElementById('tab-win').style.display = which==='win'?'block':'none';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+}
 </script>
 </body>
 </html>
