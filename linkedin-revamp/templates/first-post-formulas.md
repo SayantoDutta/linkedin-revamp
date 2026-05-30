@@ -46,7 +46,7 @@ After: branded banner, sharp headline, 4 case studies in Featured, 24 AI-builder
 
 It's all open-source. The skill drives the LinkedIn UI directly, asks 7 honest questions about what you actually want from LinkedIn, then writes and pushes every section.
 
-GitHub: github.com/SayantoDutta/linkedin-revamp
+GitHub: github.com/ShayantoDutta/linkedin-revamp
 
 If you want me to run it on your profile, DM me. First 10 for free.
 ```
@@ -170,7 +170,7 @@ Pick exactly one. Avoid more than one.
 | Goal | Pick this CTA |
 |------|---------------|
 | Build the user's network | "DM 'rebuild' and I'll send you a 60-second audit of your profile." |
-| Drive traffic to the skill repo | "Skill is open-source: github.com/SayantoDutta/linkedin-revamp" |
+| Drive traffic to the skill repo | "Skill is open-source: github.com/ShayantoDutta/linkedin-revamp" |
 | Get comments | "What's the worst thing on your current profile? I'll roast it in the comments." |
 | Get reach (algorithm bait) | "Comment 'audit' for a free read-only check of your profile." |
 | Find clients | "If you want me to run it on your profile this week, DM. First 5 free." |

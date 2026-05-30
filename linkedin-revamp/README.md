@@ -42,7 +42,7 @@ The core skill offers these in Phase 8 only if your material fits. Both also run
 ### As a Claude skill (recommended)
 
 ```bash
-git clone https://github.com/SayantoDutta/linkedin-revamp.git
+git clone https://github.com/ShayantoDutta/linkedin-revamp.git
 # copy the three skill folders into your Claude skills directory
 cp -r linkedin-revamp                 ~/.claude/skills/
 cp -r linkedin-revamp-notion          ~/.claude/skills/
@@ -52,7 +52,7 @@ cp -r linkedin-revamp-walkthrough     ~/.claude/skills/
 On Windows (PowerShell):
 
 ```powershell
-git clone https://github.com/SayantoDutta/linkedin-revamp.git
+git clone https://github.com/ShayantoDutta/linkedin-revamp.git
 Copy-Item -Recurse linkedin-revamp,linkedin-revamp-notion,linkedin-revamp-walkthrough $env:USERPROFILE\.claude\skills\
 ```
 

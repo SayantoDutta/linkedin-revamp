@@ -32,7 +32,7 @@ Three skills. The core skill works on its own; the other two are optional add-on
 ### macOS / Linux
 
 ```bash
-git clone https://github.com/SayantoDutta/linkedin-revamp.git
+git clone https://github.com/ShayantoDutta/linkedin-revamp.git
 cd linkedin-revamp
 cp -r linkedin-revamp linkedin-revamp-notion linkedin-revamp-walkthrough ~/.claude/skills/
 ```
@@ -40,7 +40,7 @@ cp -r linkedin-revamp linkedin-revamp-notion linkedin-revamp-walkthrough ~/.clau
 ### Windows (PowerShell)
 
 ```powershell
-git clone https://github.com/SayantoDutta/linkedin-revamp.git
+git clone https://github.com/ShayantoDutta/linkedin-revamp.git
 cd linkedin-revamp
 Copy-Item -Recurse linkedin-revamp,linkedin-revamp-notion,linkedin-revamp-walkthrough $env:USERPROFILE\.claude\skills\
 ```

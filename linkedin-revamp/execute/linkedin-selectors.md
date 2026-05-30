@@ -154,7 +154,7 @@ When a `find` query stops returning results:
 3. Update the query in this file.
 4. If `read_page` shows the element is genuinely gone (LinkedIn removed it), document the workaround in this file with the new flow.
 
-The skill author commits to maintaining this file. If a selector breaks during a real user session, the user should be told: "LinkedIn changed something. I'll work around it for you, but please file an issue at github.com/SayantoDutta/linkedin-revamp/issues so the skill author can patch it." Then attempt the recovery using the fallback selectors above.
+The skill author commits to maintaining this file. If a selector breaks during a real user session, the user should be told: "LinkedIn changed something. I'll work around it for you, but please file an issue at github.com/ShayantoDutta/linkedin-revamp/issues so the skill author can patch it." Then attempt the recovery using the fallback selectors above.
 
 ---
 
